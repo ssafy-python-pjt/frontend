@@ -16,20 +16,20 @@ export const useAuthStore = defineStore('auth', () => {
     const login = async (userData) => {
         try {
             const response = await axios.post(`${BASE_URL}/dj-rest-auth/login/`, userData)
-            
+
             // dj-rest-auth 응답 처리 (key 또는 token)
             const accessToken = response.data.key || response.data.token
-            
+
             token.value = accessToken
             localStorage.setItem('token', token.value)
 
             // 로그인 후 프로필 정보 즉시 로드
             await fetchProfile()
-            
+
         } catch (error) {
             console.error('로그인 실패:', error)
             alert('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.')
-            throw error 
+            throw error
         }
     }
 
@@ -41,16 +41,16 @@ export const useAuthStore = defineStore('auth', () => {
             const response = await axios.get(`${API_URL}/profile/`, {
                 headers: { Authorization: `Token ${token.value}` }
             })
-            
+
             const userData = response.data
-            
+
             // 백엔드 UserSerializer의 financial_products 필드를 프론트엔드 products로 매핑
             if (userData.financial_products) {
                 userData.products = userData.financial_products
             } else if (!userData.products) {
                 userData.products = []
             }
-            
+
             // 자산 정보가 없으면 0으로 초기화
             if (userData.assets === undefined) userData.assets = 0
 
@@ -77,7 +77,7 @@ export const useAuthStore = defineStore('auth', () => {
             token.value = null
             localStorage.removeItem('user')
             localStorage.removeItem('token')
-            window.location.href = '/' 
+            window.location.href = '/'
         }
     }
 
@@ -91,8 +91,8 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             // URL 패턴: /api/v1/products/deposit/<fin_prdt_cd>/join/
             const response = await axios.post(
-                `${API_URL}/products/deposit/${product.fin_prdt_cd}/join/`, 
-                {}, 
+                `${API_URL}/products/deposit/${product.fin_prdt_cd}/join/`,
+                {},
                 { headers: { Authorization: `Token ${token.value}` } }
             )
 
@@ -130,5 +130,39 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    return { user, token, isAuthenticated, login, logout, joinProduct, fetchProfile, signup }
+
+    const updateProfile = async (profileData) => {
+        try {
+            const response = await axios.put(`${API_URL}/profile/update/`, profileData, {
+                headers: { Authorization: `Token ${token.value}` }
+            })
+            user.value = response.data
+            localStorage.setItem('user', JSON.stringify(user.value))
+            alert('회원 정보가 수정되었습니다.')
+            return true
+        } catch (error) {
+            console.error(error)
+            alert('정보 수정 중 오류가 발생했습니다.') // image_ae008d에서 발생한 에러
+            return false
+        }
+    }
+
+    const terminateProduct = async (productId) => {
+        await axios.delete(`${API_URL}/products/joined/${productId}/`, {
+            headers: { Authorization: `Token ${token.value}` }
+        })
+        await fetchProfile()
+    }
+
+    return {
+        user,
+        token,
+        isAuthenticated,
+        login,
+        logout,
+        joinProduct,
+        fetchProfile,
+        signup,
+        updateProfile // ← 앞 뒤에 쉼표가 잘 찍혀 있는지, 오타는 없는지 확인하세요!
+    }
 })

@@ -72,24 +72,23 @@ const handleRecommend = async () => {
             <div class="mb-6 bg-gray-50 p-4 rounded-lg">
                 <h4 class="font-bold text-gray-700 mb-2"><i class="fa-solid fa-magnifying-glass-chart mr-2"></i>분석 요약</h4>
                 <div class="grid grid-cols-2 gap-4 text-sm">
-                    <div><span class="text-gray-500">목적:</span> <span class="font-medium">{{ recommendation?.analysis.purpose }}</span></div>
-                    <div><span class="text-gray-500">목표 금액:</span> <span class="font-medium">{{ recommendation?.analysis.target_amount.toLocaleString() }}원</span></div>
-                    <div><span class="text-gray-500">투자 성향:</span> <span class="font-medium text-blue-600">{{ recommendation?.analysis.risk_profile }}</span></div>
+                    <div><span class="text-gray-500">목적:</span> <span class="font-medium">{{ recommendation?.analysis?.purpose || '없음' }}</span></div>
+                    <div><span class="text-gray-500">투자 성향:</span> <span class="font-medium text-blue-600">{{ recommendation?.analysis?.risk_profile || '정보 없음' }}</span></div>
                 </div>
             </div>
 
             <!-- 추천 상품 목록 -->
             <h4 class="font-bold text-gray-700 mb-3"><i class="fa-solid fa-thumbs-up mr-2"></i>추천 상품</h4>
             <div class="space-y-3">
-                <div v-for="prod in recommendation?.products" :key="prod.id" class="border border-indigo-100 rounded-lg p-4 hover:bg-indigo-50 transition flex justify-between items-center">
+                <div v-for="prod in recommendation?.products" :key="prod.fin_prdt_cd" class="border border-indigo-100 rounded-lg p-4 hover:bg-indigo-50 transition flex justify-between items-center">
                     <div>
                         <div class="text-xs font-bold text-indigo-600">{{ prod.kor_co_nm }}</div>
                         <div class="font-bold">{{ prod.fin_prdt_nm }}</div>
-                        <div class="text-sm text-gray-500">가입기간: {{ prod.save_trm }}개월</div>
+                        <div class="text-sm text-gray-500">가입기간: {{ prod.save_trm }}개월</div> <!-- 상품 옵션에서 가입기간 표시 -->
                     </div>
                     <div class="text-right">
                         <div class="text-xs text-gray-500">예상 금리</div>
-                        <div class="text-xl font-bold text-indigo-600">{{ prod.intr_rate }}%</div>
+                        <div class="text-xl font-bold text-indigo-600">{{ prod.max_rate || '정보 없음' }}%</div> <!-- 우대 금리 표시 -->
                     </div>
                 </div>
             </div>
