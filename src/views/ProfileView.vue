@@ -13,7 +13,9 @@ const renderChart = () => {
 
     const products = authStore.user.products
     const labels = products.map(p => p.fin_prdt_nm)
-    const data = products.map(p => p.intr_rate2 || p.intr_rate || 0)
+    
+    // 금리 정보가 있는 경우 사용, 없으면 0
+    const data = products.map(p => p.options[p.options.length - 1]["intr_rate2"] || p.options[p.options.length - 1]["intr_rate"] || 0)
 
     chartInstance = new Chart(chartCanvas.value, {
         type: 'bar',
@@ -28,7 +30,12 @@ const renderChart = () => {
         },
         options: {
             responsive: true,
-            scales: { y: { beginAtZero: true } }
+            scales: { 
+                y: { 
+                    beginAtZero: true,
+                    ticks: { callback: function(value) { return value + "%" } } // y축에 퍼센트 표시
+                }
+            }
         }
     })
 }
@@ -68,7 +75,7 @@ watch(() => authStore.user, () => renderChart(), { deep: true })
             <ul class="space-y-2">
                 <li v-for="p in authStore.user.products" :key="p.fin_prdt_cd" class="flex justify-between p-3 bg-gray-50 rounded">
                     <span>{{ p.fin_prdt_nm }}</span>
-                    <span class="font-bold text-indigo-600">{{ p.intr_rate2 || p.intr_rate }}%</span>
+                    <span class="font-bold text-indigo-600">{{ p.options[p.options.length - 1]["intr_rate2"] || p.options[p.options.length - 1]["intr_rate"] }}%</span>
                 </li>
             </ul>
         </div>
