@@ -22,7 +22,13 @@ const renderChart = () => {
 
     const products = authStore.user.products
     const labels = products.map(p => p.fin_prdt_nm)
+<<<<<<< HEAD
     const data = products.map(p => p.options[p.options.length - 1]?.["intr_rate2"] || p.options[p.options.length - 1]?.["intr_rate"] || 0)
+=======
+    
+    // 금리 정보가 있는 경우 사용, 없으면 0
+    const data = products.map(p => p.options[p.options.length - 1]["intr_rate2"] || p.options[p.options.length - 1]["intr_rate"] || 0)
+>>>>>>> df15e33bc60af9dba557cea1212df09cd5c4b7cd
 
     chartInstance = new Chart(chartCanvas.value, {
         type: 'bar',
@@ -40,7 +46,11 @@ const renderChart = () => {
             scales: { 
                 y: { 
                     beginAtZero: true,
+<<<<<<< HEAD
                     ticks: { callback: function(value) { return value + "%" } } 
+=======
+                    ticks: { callback: function(value) { return value + "%" } } // y축에 퍼센트 표시
+>>>>>>> df15e33bc60af9dba557cea1212df09cd5c4b7cd
                 }
             }
         }
@@ -148,6 +158,15 @@ watch(() => authStore.user, () => renderChart(), { deep: true })
                     <input type="number" v-model="item.amount" class="w-full border p-1 rounded text-sm" placeholder="원">
                 </div>
             </div>
+<<<<<<< HEAD
+=======
+            <ul class="space-y-2">
+                <li v-for="p in authStore.user.products" :key="p.fin_prdt_cd" class="flex justify-between p-3 bg-gray-50 rounded">
+                    <span>{{ p.fin_prdt_nm }}</span>
+                    <span class="font-bold text-indigo-600">{{ p.options[p.options.length - 1]["intr_rate2"] || p.options[p.options.length - 1]["intr_rate"] }}%</span>
+                </li>
+            </ul>
+>>>>>>> df15e33bc60af9dba557cea1212df09cd5c4b7cd
         </div>
         <div v-else class="text-center py-10 text-gray-400">가입된 상품이 없습니다.</div>
     </div>
