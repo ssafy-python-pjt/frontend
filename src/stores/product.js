@@ -8,6 +8,7 @@ export const useProductStore = defineStore('product', () => {
     const deposits = ref([]) 
     const loans = ref([])    
     const recommendation = ref(null) 
+    const showResult = ref(false)  // showResult 추가
     
     // 백엔드 URL 구조 반영
     const BASE_URL = 'http://127.0.0.1:8000'
@@ -36,20 +37,19 @@ export const useProductStore = defineStore('product', () => {
     // 3. AI 금융 상품 추천
     const recommendProducts = async (userQuery) => {
         const authStore = useAuthStore()
-        
+
         if (!authStore.isAuthenticated) {
             alert("로그인이 필요한 서비스입니다.")
             return false
         }
 
         try {
-            // 추천 알고리즘을 위한 Payload 구성
             const payload = {
                 age: authStore.user?.age || 30, 
                 salary: authStore.user?.salary || 40000000,
                 money: authStore.user?.assets || 10000000,
-                target_amount: 50000000, // 목표 금액 (임시)
-                purpose: userQuery // 사용자의 입력 질문
+                target_amount: 50000000,
+                purpose: userQuery
             }
 
             const response = await axios.post(`${API_URL}/products/recommend/`, payload, {
@@ -59,6 +59,7 @@ export const useProductStore = defineStore('product', () => {
             })
 
             recommendation.value = response.data
+            showResult.value = true  // showResult 상태 업데이트
             return true
         } catch (error) {
             console.error('AI 추천 요청 실패:', error)
@@ -67,12 +68,14 @@ export const useProductStore = defineStore('product', () => {
         }
     }
 
-    return { 
-        deposits, 
-        loans, 
-        recommendation, 
-        fetchDeposits, 
-        fetchLoans, 
-        recommendProducts 
+    return {
+        products,
+        deposits,
+        loans,
+        recommendation,
+        showResult,  // showResult 리턴
+        fetchDeposits,
+        fetchLoans,
+        recommendProducts
     }
 })
