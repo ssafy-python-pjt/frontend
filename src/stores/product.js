@@ -4,27 +4,41 @@ import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
 
 export const useProductStore = defineStore('product', () => {
-    const products = ref([]) 
-    const deposits = ref([]) 
-    const loans = ref([])    
-    const recommendation = ref(null) 
-    const showResult = ref(false)  // showResult 추가
-    
-    // 백엔드 URL 구조 반영
+    // 1. 상태 정의: 예금, 적금, 대출을 각각 분리하여 관리
+    const deposits = ref([])      // 정기예금
+    const savings = ref([])       // 적금
+    const loans = ref([])         // 전세자금대출
+    const recommendation = ref(null)
+    const showResult = ref(false)
+
     const BASE_URL = 'http://127.0.0.1:8000'
     const API_URL = `${BASE_URL}/api/v1`
 
-    // 1. 정기예금 상품 목록 조회
+    // 2. 정기예금 목록 조회 (type=deposit 파라미터 사용)
     const fetchDeposits = async () => {
         try {
-            const response = await axios.get(`${API_URL}/products/deposit/`)
+            const response = await axios.get(`${API_URL}/products/deposit/`, {
+                params: { type: 'deposit' }
+            })
             deposits.value = response.data
         } catch (error) {
             console.error('정기예금 목록 조회 실패:', error)
         }
     }
 
-    // 2. 전세자금대출 상품 조회
+    // 3. 적금 목록 조회 (type=saving 파라미터 사용) [추가]
+    const fetchSavings = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/products/deposit/`, {
+                params: { type: 'saving' }
+            })
+            savings.value = response.data
+        } catch (error) {
+            console.error('적금 목록 조회 실패:', error)
+        }
+    }
+
+    // 4. 전세자금대출 상품 조회
     const fetchLoans = async () => {
         try {
             const response = await axios.get(`${API_URL}/products/loan/rent/`)
@@ -34,7 +48,7 @@ export const useProductStore = defineStore('product', () => {
         }
     }
 
-    // 3. AI 금융 상품 추천
+    // 5. AI 금융 상품 추천 (기존 로직 유지하되 필요 시 페이로드 확장 가능)
     const recommendProducts = async (userQuery) => {
         const authStore = useAuthStore()
 
@@ -44,11 +58,11 @@ export const useProductStore = defineStore('product', () => {
         }
 
         try {
+            // 백엔드 recommend_product 뷰의 요구사항에 맞춰 페이로드 구성
             const payload = {
-                age: authStore.user?.age || 30, 
+                age: authStore.user?.age || 30,
                 salary: authStore.user?.salary || 40000000,
-                money: authStore.user?.assets || 10000000,
-                target_amount: 50000000,
+                money: authStore.user?.money || 10000000, // models.py의 필드명 'money' 반영
                 purpose: userQuery
             }
 
@@ -59,7 +73,7 @@ export const useProductStore = defineStore('product', () => {
             })
 
             recommendation.value = response.data
-            showResult.value = true  // showResult 상태 업데이트
+            showResult.value = true
             return true
         } catch (error) {
             console.error('AI 추천 요청 실패:', error)
@@ -69,12 +83,13 @@ export const useProductStore = defineStore('product', () => {
     }
 
     return {
-        products,
         deposits,
+        savings,
         loans,
         recommendation,
-        showResult,  // showResult 리턴
+        showResult,
         fetchDeposits,
+        fetchSavings,
         fetchLoans,
         recommendProducts
     }

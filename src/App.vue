@@ -92,7 +92,7 @@ const authStore = useAuthStore()
 
     <footer class="bg-gray-800 text-white py-8 mt-auto hidden md:block">
       <div class="max-w-7xl mx-auto px-4 text-center">
-        <p class="mb-2 font-bold text-lg">SSAFY 12th Financial Project - FINAI</p>
+        <p class="mb-2 font-bold text-lg">SSAFY 14th Financial Project - FINAI</p>
         <p class="text-gray-400 text-sm">© 2025 FINAI Corp. All rights reserved.</p>
         <div class="mt-4 flex justify-center space-x-6 text-xl">
             <a href="#" class="text-gray-400 hover:text-white transition"><i class="fa-brands fa-github"></i></a>
